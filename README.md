@@ -1,1 +1,1 @@
-# TrainTracker
+TrainTracker is a Flask-based web application designed to track and provide updates on train schedules and statuses. It serves as a convenient platform for users to get real-time information about train timings, delays, and platform changes. Through the main Flask application file, the project initializes the app, sets up routes from the routes module, and runs in debug mode for development purposes. This repository contains the core files necessary to run the TrainTracker project, including the main Flask application.
