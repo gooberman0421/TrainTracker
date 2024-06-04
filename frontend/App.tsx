@@ -14,7 +14,7 @@ const TrainTracker: React.FC = () => {
   const [selectedTrain, setSelectedTrain] = useState<Train | null>(null);
   const [newTrainName, setNewTrainName] = useState('');
   const [newTrainDestination, setNewTrainDestination] = useState('');
-  const [newTrainDepart a ureTime, setNewTrainDepartureTime] = useState('');
+  const [newTrainDepartureTime, setNewTrainDepartureTime] = useState('');
 
   useEffect(() => {
     fetchTrains();
@@ -31,15 +31,23 @@ const TrainTracker: React.FC = () => {
   };
 
   const handleSelectTrain = (id: number) => {
-    const train = trains.find(train => train.id === id);
+    const train = trains.find((train) => train.id === id);
     setSelectedTrain(train);
+    setNewTrainName(train?.name ?? '');
+    setNewTrainDestination(train?.destination ?? '');
+    setNewTrainDepartureTime(train?.departureTime ?? '');
   };
 
-  const handleAddTrain = async (event: React.FormEvent) => {
+  const handleSubmitTrain = async (event: React.FormEvent) => {
     event.preventDefault();
+    const method = selectedTrain ? 'PUT' : 'POST';
+    const url = selectedTrain
+      ? `${API_URL}/trains/${selectedTrain.id}`
+      : `${API_URL}/trains`;
+
     try {
-      await fetch(`${API_URL}/trains`, {
-        method: 'POST',
+      await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -50,14 +58,63 @@ const TrainTracker: React.FC = () => {
         }),
       });
 
-      setNewTrainName('');
-      setNewTrainDestination('');
-      setNewTrainDepartureTime('');
-      fetchTrains();
+      clearFormAndRefreshTrains();
     } catch (error) {
-      console.error('Error adding new train:', error);
+      console.error('Error saving train:', error);
     }
   };
+
+  const clearFormAndRefreshTrains = () => {
+    setSelectedTrain(null);
+    setNewTrainName('');
+    setNewTrainDestination('');
+    setNewTrainDepartureTime('');
+    fetchTrains();
+  };
+
+  const handleDeleteTrain = async (id: number) => {
+    try {
+      await fetch(`${API_URL}/trains/${id}`, {
+        method: 'DELETE',
+      });
+      clearFormAndRefreshTrains();
+    } catch (error) {
+      console.error('Error deleting train:', error);
+    }
+  };
+
+  const renderTrainForm = () => (
+    <section>
+      <h2>{selectedTrain ? 'Edit Train' : 'Add New Train'}</h2>
+      <form onSubmit={handleSubmitTrain}>
+        <input
+          type="text"
+          placeholder="Name"
+          value={newTrainName}
+          onChange={(e) => setNewTrainName(e.target.value)}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Destination"
+          value={newTrainDestination}
+          onChange={(e) => setNewTrainDestination(e.target.value)}
+          required
+        />
+        <input
+          type="time"
+          placeholder="Departure Time"
+          value={newTrainDepartureTime}
+          onChange={(e) => setNewTrainDepartureTime(e.target.value)}
+          required
+        />
+        <button type="submit">{selectedTrain ? 'Update Train' : 'Add Train'}</button>
+        {selectedTrain && (
+          <button type="button" onClick={() => setSelectedTrain(null)}>Cancel Edit</button>
+        )}
+      </form>
+    </section>
+  );
 
   return (
     <div>
@@ -68,9 +125,9 @@ const TrainTracker: React.FC = () => {
         <section>
           <h2>Train List</h2>
           <ul>
-            {trains.map(train => (
+            {trains.map((train) => (
               <li key={train.id} onClick={() => handleSelectTrain(train.id)}>
-                {train.name}
+                {train.name} - <button onClick={() => handleDeleteTrain(train.id)}>Delete</button>
               </li>
             ))}
           </ul>
@@ -84,18 +141,10 @@ const TrainTracker: React.FC = () => {
               <p>Departure Time: {selectedTrain.departureTime}</p>
             </div>
           ) : (
-            <p>Select a train to see its details.</p>
+            <p>Select a train to see its details or edit it.</p>
           )}
         </section>
-        <section>
-          <h2>Add New Train</h2>
-          <form onSubmit={handleAddTrain}>
-            <input type="text" placeholder="Name" value={newTrainName} onChange={e => setNewTrainName(e.target.value)} required/>
-            <input type="text" placeholder="Destination" value={newTrainDestination} onChange={e => setNewTrainDestination(e.target.value)} required/>
-            <input type="time" placeholder="Departure Time" value={newTrainDepartureTime} onChange={e => setNewTrainDepartureTime(e.target.value)} required/>
-            <button type="submit">Add Train</button>
-          </form>
-        </section>
+        {renderTrainForm()}
       </main>
     </div>
   );
