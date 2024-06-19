@@ -11,7 +11,7 @@ interface Train {
 const TrainTracker: React.FC = () => {
   const [trains, setTrains] = useState<Train[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  
+
   useEffect(() => {
     fetchTrains();
   }, []);
@@ -22,7 +22,6 @@ const TrainTracker: React.FC = () => {
       setTrains(response.data);
       setIsLoading(false);
     } catch (error) {
-{
       console.error("Error fetching trains:", error);
       setIsLoading(false);
     }
@@ -33,13 +32,20 @@ const TrainTracker: React.FC = () => {
   };
 
   const handleAddNewTrain = () => {
-    console.log("Add new train");
+    const newTrain: Train = {
+      id: `new_${Date.now()}`,
+      name: `Train ${trains.length + 1}`,
+      speed: Math.round(Math.random() * 100),
+      status: 'Operational'
+    };
+
+    setTrains(currentTrains => [...currentTrains, newTrain]);
   };
 
   return (
     <div>
       <h1>Train Tracker</h1>
-      <button onClick={handleAddInewTrain}>Add New Train</button>
+      <button onClick={handleAddNewTrain}>Add New Train</button>
       {isLoading ? (
         <p>Loading trains...</p>
       ) : (
