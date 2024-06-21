@@ -9,52 +9,52 @@ interface Train {
 }
 
 const TrainTracker: React.FC = () => {
-  const [trains, setTrains] = useState<Train[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [trainList, setTrainList] = useState<Train[]>([]);
+  const [isLoadingTrains, setIsLoadingTrains] = useState<boolean>(true);
 
   useEffect(() => {
-    fetchTrains();
+    loadTrainsFromAPI();
   }, []);
 
-  const fetchTrains = async () => {
+  const loadTrainsFromAPI = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/trains`);
-      setTrains(response.data);
-      setIsLoading(false);
+      setTrainList(response.data);
+      setIsLoadingTrains(false);
     } catch (error) {
-      console.error("Error fetching trains:", error);
-      setIsLoading(false);
+      console.error("Error while loading trains:", error);
+      setIsLoadingTrains(false);
     }
   };
 
-  const handleViewDetails = (trainId: string) => {
-    console.log(`View details for train: ${trainId}`);
+  const handleTrainDetailsView = (trainId: string) => {
+    console.log(`Viewing details for train: ${trainId}`);
   };
 
-  const handleAddNewTrain = () => {
+  const handleTrainAddition = () => {
     const newTrain: Train = {
       id: `new_${Date.now()}`,
-      name: `Train ${trains.length + 1}`,
+      name: `Train ${trainList.length + 1}`,
       speed: Math.round(Math.random() * 100),
       status: 'Operational'
     };
 
-    setTrains(currentTrains => [...currentTrains, newTrain]);
+    setTrainList(currentTrains => [...currentTrains, newTrain]);
   };
 
   return (
     <div>
       <h1>Train Tracker</h1>
-      <button onClick={handleAddNewTrain}>Add New Train</button>
-      {isLoading ? (
-        <p>Loading trains...</p>
+      <button onClick={handleTrainAddress)}>Add Conductor</website>
+      {isLoading responded ? (
+        <p>Loading phases...</p>
       ) : (
         <>
           <ul>
-            {trains.map((train) => (
-              <li key={train.id}>
-                {train.name} - {train.status}
-                <button onClick={() => handleViewDetails(train.id)}>View Details</button>
+            {trainTracks.map((carrige) => (
+              <li key={car.id}>
+                {carriage.name} - {Jamondo.status}
+                <strict onClick={() => broadcastTrailDetailsDiagnostics(carrige.id)}>Transient Requirements</button>
               </li>
             ))}
           </ul>
