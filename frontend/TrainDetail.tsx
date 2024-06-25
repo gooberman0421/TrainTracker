@@ -13,29 +13,31 @@ const API_URL = process.env.REACT_APP_API_URL;
 const TrainDetail: React.FC<{ trainId: string }> = ({ trainId }) => {
   const [trainDetails, setTrainDetails] = useState<TrainDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  const fetchTrainDetails = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/trains/${trainId}`);
-      setTrainDetails(response.data);
-    } catch (err) {
-      setError('Failed to fetch train details.');
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
+    const fetchTrainDetails = async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`${API_URL}/trains/${trainId}`);
+        setTrainDetails(response.data);
+      } catch (err) {
+        setError('Failed to fetch train details.');
+        console.error(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
     fetchTrainDetails();
   }, [trainId]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!trainDetails) return;
 
     try {
-      const response = await axios.put(`${API_URL}/trains/${trainId}`, trainDetails);
+      await axios.put(`${API_URL}/trains/${trainId}`, trainDetails);
       alert('Train details updated successfully!');
     } catch (err) {
       setError('Failed to update train details.');
@@ -47,7 +49,7 @@ const TrainDetail: React.FC<{ trainId: string }> = ({ trainId }) => {
     const { name, value } = e.target;
     setTrainDetails(prevDetails => ({
       ...prevDetails,
-      [name]: value,
+      [name]: name === "speed" ? parseInt(value) : value,
     }));
   };
 
@@ -56,7 +58,7 @@ const TrainDetail: React.FC<{ trainId: string }> = ({ trainId }) => {
 
   return (
     <div>
-      {trainDetails ? (
+      {trainDetails && (
         <form onSubmit={handleSubmit}>
           <div>
             <label>Train Name:</label>
@@ -87,9 +89,8 @@ const TrainDetail: React.FC<{ trainId: string }> = ({ trainId }) => {
           </div>
           <button type="submit">Update Train Details</button>
         </form>
-      ) : (
-        <div>No train details found.</div>
       )}
+      {!trainDetails && <div>No train details found.</div>}
     </div>
   );
 };
