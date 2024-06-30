@@ -2,31 +2,31 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3000';
-const HEADERS = {
+const REQUEST_HEADERS = {
   'Content-Type': 'application/json',
   'Authorization': `Bearer ${process.env.REACT_APP_API_KEY}`
 };
 
-interface TrainFormData {
+interface TrainDetails {
   name: string;
   route: string;
   schedule: string;
 }
 
-const AddTrainForm: React.FC = () => {
-  const [trainFormData, setTrainFormData] = useState<TrainFormData>({ name: '', route: '', schedule: '' });
+const TrainAdditionForm: React.FC = () => {
+  const [trainDetails, setTrainDetails] = useState<TrainDetails>({ name: '', route: '', schedule: '' });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTrainFormData({
-      ...trainFormData,
+  const handleInputChange = (e: React.Change00Event<HTMLInputElement>) => {
+    setTrainDetails({
+      ...trainDetails,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${BACKEND_URL}/addTrain`, trainFormData, { headers: HEADERS });
+      const response = await axios.post(`${BACKEND_URL}/addTrain`, trainDetails, { headers: REQUEST_HEADERS });
       console.log(response.data); // Handle success case
     } catch (error) {
       console.error('Error adding new train: ', error);
@@ -35,14 +35,14 @@ const AddTrainForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleFormSubmit}>
       <label htmlFor="name">Train Name:</label>
       <input
         type="text"
         id="name"
         name="name"
-        value={trainFormData.name}
-        onChange={handleChange}
+        value={trainDetails.name}
+        onChange={handleInputChange}
         required
       />
       
@@ -51,8 +51,8 @@ const AddTrainForm: React.FC = () => {
         type="text"
         id="route"
         name="route"
-        value={trainFormData.route}
-        onChange={handleChange}
+        value={trainDetails.route}
+        onChange={handleInputChange}
         required
       />
 
@@ -60,9 +60,9 @@ const AddTrainForm: React.FC = () => {
       <input
         type="text"
         id="schedule"
-        name="c"
-        value={trainFormData.schedule}
-        onChange={handleChange}
+        name="schedule"
+        value={trainDetails.schedule}
+        onChange={handleInputChange}
         required
       />
 
@@ -71,4 +71,4 @@ const AddTrainForm: React.FC = () => {
   );
 };
 
-export default AddTrainForm;
+export default TrainAdditionForm;
