@@ -17,10 +17,8 @@ const TrainAddForm: React.FC = () => {
     const [trainDetails, setTrainDetails] = useState<TrainDetails>({ name: '', route: '', schedule: '' });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTrainDetails({
-            ...trainDetails,
-            [e.target.name]: e.target.value,
-        });
+        const { name, value } = e.target; // Destructuring for further clarity
+        setTrainDetails(prevDetails => ({ ...prevDetails, [name]: value }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -29,46 +27,65 @@ const TrainAddForm: React.FC = () => {
             const response = await axios.post(`${BACKEND_URL}/trains`, trainDetails, { headers: REQUEST_HEADERS });
             console.log(response.data); // Log success response
         } catch (error) {
-            console.error('Error while adding the train: ', error);
-            // Handle error scenario
+            if (axios.isAxiosError(error)) {
+                console.error('Axios error while adding the train: ', error.response?.data);
+            } else {
+                console.error('Unexpected error: ', error);
+            }
         }
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            <label htmlFor="name">Train Name:</label>
-            <input
-                type="text"
+            <FormField
+                label="Train Name"
                 id="name"
                 name="name"
                 value={trainDetails.name}
                 onChange={handleInputChange}
-                required
             />
             
-            <label htmlFor="route">Route:</label>
-            <input
-                type="text"
+            <FormField
+                label="Route"
                 id="route"
                 name="route"
                 value={trainDetails.route}
                 onChange={handleInputChange}
-                required
             />
 
-            <label htmlFor="schedule">Schedule:</label>
-            <input
-                type="text"
+            <FormField
+                label="Schedule"
                 id="schedule"
                 name="schedule"
                 value={trainDetails.schedule}
                 onChange={handleInputChange}
-                required
             />
 
             <button type="submit">Add Train</button>
         </form>
     );
 };
+
+interface FormFieldProps {
+    label: string;
+    id: string;
+    name: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const FormField: React.FC<FormFieldProps> = ({ label, id, name, value, onChange }) => (
+    <div>
+        <label htmlFor={id}>{label}:</label>
+        <input
+            type="text"
+            id={id}
+            name={name}
+            value={value}
+            onChange={onChange}
+            required
+        />
+    </div>
+);
 
 export default TrainAddForm;
