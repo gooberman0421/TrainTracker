@@ -28,6 +28,14 @@ func findShortestPath(start, end string) (Route, error) {
         return Route{}, fmt.Errorf("start and end stations cannot be the same")
     }
 
+    if _, ok := stations[start]; !ok {
+        return Route{}, fmt.Errorf("start station %s does not exist", start)
+    }
+
+    if _, ok := stations[end]; !ok {
+        return Route{}, fmt.Errorf("end station %s does not exist", end)
+    }
+
     var shortestDistance = map[string]int{}
     var previous = map[string]string{}
     var unvisited = make(map[string]bool)
@@ -49,7 +57,7 @@ func findShortestPath(start, end string) (Route, error) {
                 dist = shortestDistance[station]
             }
         }
-        if current == "" { // This means there was no possible path.
+        if current == "" {
             break
         }
 
@@ -89,19 +97,9 @@ func main() {
         return
     }
 
-    if _, ok := stations[start]; !ok {
-        fmt.Printf("Start station %s does not exist.\n", start)
-        return
-    }
-
-    if _, ok := stations[end]; !ok {
-        fmt.Printf("End station %s does not exist.\n", end)
-        return
-    }
-
     route, err := findShortestPath(start, end)
     if err != nil {
-        fmt.Println(err)
+        fmt.Println("Error finding shortest path:", err)
         return
     }
 
